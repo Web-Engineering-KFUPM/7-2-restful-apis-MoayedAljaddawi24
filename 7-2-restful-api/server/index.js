@@ -40,6 +40,27 @@ app.get("/api/songs/:id", async (req, res) => {
   res.json(s);
 });
 
+// /api/songs/:id (Update song)
+app.put("/api/songs/:id", async (req, res) => {
+  try {
+    const { title = "", artist = "", year } = req.body || {};
+    const updated = await Song.findByIdAndUpdate(
+      req.params.id,
+      {
+        title: title.trim(),
+        artist: artist.trim(),
+        year,
+      },
+      { new: true, runValidators: true }
+    );
+
+    if (!updated) return res.status(404).json({ message: "Song not found" });
+    res.json(updated);
+  } catch (err) {
+    res.status(400).json({ message: err.message || "Update failed" });
+  }
+});
+
 async function start() {
   try {
     const mongoUrl = process.env.MONGO_URL;
@@ -58,8 +79,5 @@ async function start() {
 }
 
 start();
-
-// /api/songs/:id (Update song)
-
 
 // /api/songs/:id (Delete song)
